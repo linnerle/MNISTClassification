@@ -137,7 +137,22 @@ class MLP:
         return loss
 
 
+# Evaluation helper function to check accuracy for any given dataloader
+def evaluate(model, loader, input_size):
+    correct_pred = 0
+    total_pred = 0
+    for inputs, labels in loader:
+        x = inputs.view(-1, input_size).numpy()
+        y = labels.numpy()
+        pred = model.forward(x)
+        predicted_labels = np.argmax(pred, 1)
+        correct_pred += np.sum(predicted_labels == y)
+        total_pred += len(labels)
+    return correct_pred / total_pred
+
 # Requirement (7) Main function.
+
+
 def main():
     # Loads Datasets directly from torchvision abstraction wrapper
     train_loader, test_loader = load_data()
@@ -156,6 +171,11 @@ def main():
     # Generates standard MLP instance instance passing defined sizes
     model = MLP(input_size, hidden_size, output_size, lr)
 
+    # Tracking metrics for figures
+    loss_history = []
+    train_acc_history = []
+    test_acc_history = []
+
     # Requirement (3): Iterates across all loaded batch samples
     for epoch in range(num_epochs):
         # Accumulates iteration loss strictly for total averaging per round
@@ -172,30 +192,26 @@ def main():
             # Adds extracted sample cost output strictly up towards final reporting
             total_loss += loss
 
+        # Track loss inside history
+        avg_loss = total_loss / len(train_loader)
+        loss_history.append(avg_loss)
+
+        # Track accuracy for both train and test loaders
+        train_acc = evaluate(model, train_loader, input_size)
+        test_acc = evaluate(model, test_loader, input_size)
+        train_acc_history.append((epoch + 1, train_acc))
+        test_acc_history.append((epoch + 1, test_acc))
+
         # Additional Specification (3): Implements printing training loop logging
         print(
-            f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(train_loader)}")
+            f"Epoch {epoch+1}/{num_epochs}, Loss: {avg_loss:.4f}, Train Acc: {train_acc:.4f}, Test Acc: {test_acc:.4f}")
 
-    # Defines variables checking validation constraints matches properly
-    correct_pred = 0
-    # Monitors dataset totality mapped mathematically
-    total_pred = 0
-    # Checks actual real testing data not used inside the training blocks
-    for inputs, labels in test_loader:
-        # Unpacks explicit Array mapped logically onto 1-D flattened pipeline vectors
-        x = inputs.view(-1, input_size).numpy()
-        # Transfers test truth label to basic math variables
-        y = labels.numpy()
-        # Reuses exact existing weights bypassing training directly pulling raw model predictions
-        pred = model.forward(x)
-        # Snaps probabilities predicting maximal matching indexes
-        predicted_labels = np.argmax(pred, 1)
-        # Records counts exactly true over correct assumptions iteratively mapping mathematically
-        correct_pred += np.sum(predicted_labels == y)
-        # Adds exact total batch sizing dynamically
-        total_pred += len(labels)
     # Additional Specification (2): Report/Print Test Accuracy after training mapped
-    print(f"Test Accuracy: {correct_pred/total_pred}")
+    final_test_acc = evaluate(model, test_loader, input_size)
+    print(f"Final Test Accuracy: {final_test_acc:.4f}")
+
+    # Return the trained model, metrics, and test loader for reporting purposes
+    return model, loss_history, train_acc_history, test_acc_history, test_loader
 
 
 if __name__ == "__main__":

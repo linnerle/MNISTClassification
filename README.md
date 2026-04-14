@@ -35,8 +35,8 @@ This project was developed using Python 3.13.7 and assumes you have it installed
     ```bash
     The number of training data: 60000
     The number of testing data: 10000
-    Epoch 1/30, Loss: 0.6060438884279873
+    Epoch 1/30, Loss: 0.6089, Train Acc: 0.9014, Test Acc: 0.9038
     ...
-    Epoch 30/30, Loss: 0.01964185947754861
-    Test Accuracy: 0.9787
+    Epoch 30/30, Loss: 0.0187, Train Acc: 0.9976, Test Acc: 0.9798
+    Final Test Accuracy: 0.9798
     ```
