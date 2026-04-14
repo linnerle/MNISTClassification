@@ -1,3 +1,14 @@
+"""
+CNN Template for MNIST Classification
+Author: Dong Yang
+Date: 03-12-2026
+https://github.com/DongYang26/CSC4851_6851/tree/main/MNIST
+
+Modified by: Linn Kloefta
+Date: 04-14-2026
+https://github.com/linnerle/MNISTClassification
+"""
+
 import numpy as np
 import torchvision
 import torchvision.transforms as transforms

@@ -1,5 +1,8 @@
 """
 MNIST Dataset Loading Example for Deep Learning Projects
+Author: Dong Yang
+Date: 03-12-2026
+https: // github.com/DongYang26/CSC4851_6851/tree/main/MNIST
 =====================================================
 
 This script demonstrates how to load and preprocess the MNIST dataset using PyTorch.
