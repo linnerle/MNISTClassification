@@ -2,7 +2,7 @@
 
 CSC4851 Spring 2026
 
-This repository contains the implementation of machine learning models for classifying handwritten digits from the MNIST dataset. It features both a completely from-scratch Multi-Layer Perceptron (MLP) built using only NumPy, and a Convolutional Neural Network (CNN) built using PyTorch. For a detailed analysis of the models' performance and evaluation, please refer to the project report located in the `report/` directory.
+This repository contains the implementation of machine learning models for classifying handwritten digits from the MNIST dataset. It features both a completely from-scratch Multi-Layer Perceptron (MLP), and a Convolutional Neural Network (CNN). For a detailed analysis of the models' performance and evaluation, please refer to the project report located in the `report/` directory.
 
 ## Setup
 
