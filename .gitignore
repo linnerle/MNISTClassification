@@ -6,3 +6,9 @@ __pycache__/
 *.log
 *.synctex.gz
 *.fls
+
+# image files
+report/images/
+CNNfigures.ipynb
+MLPfigures.ipynb
+presentation_notes.md
