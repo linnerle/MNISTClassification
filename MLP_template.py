@@ -61,11 +61,11 @@ def load_data():
 class MLP:
     def __init__(self, input_size, hidden_size, output_size, lr):
         # Additional specification (1): Uses Gaussian distribution (randn) to independently initialize weights
-        self.w1 = np.random.randn(input_size, hidden_size) * 0.01
+        self.w1 = np.random.randn(input_size, hidden_size) * 0.05
         # Additional specification (1): Initializes biases exactly at zero
         self.b1 = np.zeros((1, hidden_size))
         # Repeats Gaussian distribution for Output Layer weights
-        self.w2 = np.random.randn(hidden_size, output_size) * 0.01
+        self.w2 = np.random.randn(hidden_size, output_size) * 0.05
         # Initializes second list of biases at zero
         self.b2 = np.zeros((1, output_size))
         # Stores learning rate internally

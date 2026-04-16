@@ -1,2 +1,10 @@
-\section{Learning outcomes (20)}
-tasks accomplished by each team member, reasons for unaccomplished tasks or any failures, lessons learned from the project and teamwork experience. 
+\section{Learning Outcomes}
+
+\subsection{Tasks Accomplished}
+Over the course of this initiative, the core logic mapping for robust Neural Networks (both MLP and CNN architectures) was successfully achieved operating strictly utilizing pure NumPy matrix operations. We executed fully bespoke dataloading, unabstracted Forward Propagation layers (utilizing ReLU, Sigmoid and custom stable Softmax bindings), mathematically derived Backward Propagation cost derivatives mapped via careful chain-rule calculus, and effectively evaluated the resulting network implementations via detailed diagnostic visual metrics. 
+
+\subsection{Challenges and Debugging Realities}
+Several profound constraints were encountered navigating mathematical thresholds organically. Chief among them involved floating point limits—specifically `NaN` returns spawned rapidly from exponential algorithms executing excessively large gradients (Gradient Explosion) and Cross-Entropy loss functions returning `-inf` errors evaluating arrays matching exactly zero. Effectively navigating these barriers heavily required establishing internal offsets (like epsilon values inside logarithms) and numerically stable maximums before Softmax distributions scaled, granting genuine stability directly into the backpropagation cycle. 
+
+\subsection{Lessons Learned}
+The manual reconstruction of algorithms typically handled safely behind high-level APIs (like PyTorch) significantly clarified why granular hyperparameter initializations govern model feasibility. Observing empirical evidence mapping localized structural weight limits confirmed exactly how gradients flow iteratively across dense architectures, delivering foundational insight paramount for advanced machine learning workflows hereafter. 

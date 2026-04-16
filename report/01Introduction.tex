@@ -1,2 +1,14 @@
-\section{Introduction (10)}
-background and motivation, problem definition, system overview, etc.
+\section{Introduction}
+
+\subsection{Background and Motivation}
+Handwritten digit classification using the MNIST dataset is a classic benchmark problem in computer vision and machine learning. While modern deep learning frameworks (such as PyTorch or TensorFlow) provide high-level abstractions to build models effortlessly, this project is motivated by a desire to understand the fundamental mathematical operations behind neural networks. By implementing the architecture entirely from scratch using foundational tools like NumPy, we obtain a deeper, transparent view into how models actually learn.
+
+\subsection{Problem Definition}
+The primary objective of this project is to build functioning neural networks capable of correctly classifying $28\times 28$ grayscale images of handwritten digits (0-9) from the MNIST dataset. The challenge is characterized by strict constraints: we are not permitted to use any pre-built deep learning libraries. Instead, we must manually design, implement, and orchestrate the matrix multiplications, activation functions, loss calculations, and gradient derivations forming the backpropagation pipeline.
+
+\subsection{System Overview}
+To tackle the classification problem, two distinct neural network architectures are manually implemented and evaluated in this project:
+\begin{enumerate}
+    \item \textbf{Multilayer Perceptron (MLP):} A standard 2-layer fully connected network incorporating a hidden layer of 128 neurons activated by a Sigmoid function, and a 10-neuron output layer activated by Softmax.
+    \item \textbf{Convolutional Neural Network (CNN):} A 2-layer network extracting spatial hierarchies, comprising a Convolutional Layer ($5\times 5$ kernel, ReLU activation) flattened into a Fully Connected Layer (Softmax activation).
+\end{enumerate}
