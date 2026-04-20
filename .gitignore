@@ -12,3 +12,7 @@ report/images/
 CNNfigures.ipynb
 MLPfigures.ipynb
 presentation_notes.md
+*.out
+*.synctex.gz
+*.toc
+
