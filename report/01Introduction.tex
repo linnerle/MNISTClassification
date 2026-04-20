@@ -1,14 +1,15 @@
 \section{Introduction}
 
 \subsection{Background and Motivation}
-Handwritten digit classification using the MNIST dataset is a classic benchmark problem in computer vision and machine learning. While modern deep learning frameworks (such as PyTorch or TensorFlow) provide high-level abstractions to build models effortlessly, this project is motivated by a desire to understand the fundamental mathematical operations behind neural networks. By implementing the architecture entirely from scratch using foundational tools like NumPy, we obtain a deeper, transparent view into how models actually learn.
+MNIST digit classification is a common way to test how neural networks learn. Since this was an individual project, I used it as a chance to understand that learning process myself. The assignment required manual implementation, so instead of using high-level deep-learning layers, I implemented forward propagation, loss calculation, and backpropagation directly using NumPy.
 
 \subsection{Problem Definition}
-The primary objective of this project is to build functioning neural networks capable of correctly classifying $28\times 28$ grayscale images of handwritten digits (0-9) from the MNIST dataset. The challenge is characterized by strict constraints: we are not permitted to use any pre-built deep learning libraries. Instead, we must manually design, implement, and orchestrate the matrix multiplications, activation functions, loss calculations, and gradient derivations forming the backpropagation pipeline.
+The main task is to classify $28\times 28$ grayscale images of digits (0--9). In this report, I compare the two required architectures based on how they train, how well they perform on test data, and where they still make mistakes.
 
 \subsection{System Overview}
-To tackle the classification problem, two distinct neural network architectures are manually implemented and evaluated in this project:
+I study two manually implemented models:
 \begin{enumerate}
-    \item \textbf{Multilayer Perceptron (MLP):} A standard 2-layer fully connected network incorporating a hidden layer of 128 neurons activated by a Sigmoid function, and a 10-neuron output layer activated by Softmax.
-    \item \textbf{Convolutional Neural Network (CNN):} A 2-layer network extracting spatial hierarchies, comprising a Convolutional Layer ($5\times 5$ kernel, ReLU activation) flattened into a Fully Connected Layer (Softmax activation).
+    \item \textbf{Multilayer Perceptron (MLP):} a 2-layer fully connected network with Sigmoid in the hidden layer and Softmax in the output layer, trained for up to 30 epochs.
+    \item \textbf{Convolutional Neural Network (CNN):} one valid-mode convolution layer with ReLU, followed by a fully connected Softmax output layer, trained for up to 5 epochs.
 \end{enumerate}
+For both models, I use the same MNIST train/test split and evaluate them using training logs and the figures included in this report.

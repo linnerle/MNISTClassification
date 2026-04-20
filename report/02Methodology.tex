@@ -1,31 +1,84 @@
 \section{Methodology}
 
-\subsection{Algorithms and Architecture}
-The project requires the complete manual implementation of the forward sequence, performance evaluation (loss), and backward sequence (gradient traversal) for two distinct models.
+\subsection{Implementation Setup}
+I implemented the two models in separate files: \texttt{MLP\_template.py} for the fully connected network and \texttt{CNN\_template.py} for the convolutional network. In both files, the training logic is written manually: forward pass, loss calculation, backward pass, and parameter update.
+
+\subsection{Data Pipeline and Preprocessing}
+The same data pipeline is used in both templates, and it is implemented in three steps:
+\begin{enumerate}
+    \item Load MNIST from \texttt{./data/mnist} using torchvision dataloaders.
+    \item Convert images with \texttt{ToTensor()}.
+    \item Normalize with \texttt{Normalize((0.5,), (0.5,))} so inputs are centered around zero.
+\end{enumerate}
+Centering inputs around zero helps keep activations and gradients more stable during training.
+
+Batch size is model-specific in the templates:
+\begin{itemize}
+    \item \textbf{MLP batch size = 128:} gives efficient matrix updates and smoother gradients from batch averaging.
+    \item \textbf{CNN batch size = 64:} keeps training stable while limiting the cost of manual convolution loops in NumPy.
+\end{itemize}
 
 \subsubsection{Multilayer Perceptron (MLP) Implementation}
-The MLP translates a flattened 784-dimensional image vector through a hidden feature space of 128 neurons before compiling logits for the 10 digit classes. The forward sequence dictates:
+The MLP implementation in \texttt{MLP\_template.py} follows this step-by-step flow:
+\begin{enumerate}
+    \item Flatten each $28\times 28$ image into a 784-dimensional vector.
+    \item Run the first linear layer and Sigmoid activation.
+    \item Run the second linear layer and Softmax to get class probabilities.
+    \item Compute cross-entropy loss, backpropagate gradients, and update weights with gradient descent.
+\end{enumerate}
+
+The forward equations are:
 \begin{equation}
 Z^{[1]} = XW^{[1]} + B^{[1]}, \quad A^{[1]} = \sigma\left(Z^{[1]}\right) = \frac{1}{1 + e^{-Z^{[1]}}}
 \end{equation}
 \begin{equation}
-Z^{[2]} = A^{[1]}W^{[2]} + B^{[2]}, \quad A^{[2]} = \text{softmax}\left(Z^{[2]}\right)
+Z^{[2]} = A^{[1]}W^{[2]} + B^{[2]}, \quad A^{[2]} = \mathrm{softmax}\left(Z^{[2]}\right)
 \end{equation}
-During the backward pass (refer to Figure \ref{fig:mlp_flowchart}), gradients are propagated from the cross-entropy cost function using the chain rule. The explicit parameters update follows vanilla Gradient Descent logic, systematically penalizing weights based on their specific contribution to classification error averages across the batch.
 
-\subsubsection{Convolutional Neural Network (CNN) Implementation}
-Unlike the flattened MLP, the CNN natively parses the 2D configuration ($28\times 28$) of the image. The forward pass applies a valid-mode 2D convolution sweeping over the input pixels:
+Backpropagation uses Softmax--cross-entropy output gradients and Sigmoid chain-rule terms. The chosen MLP parameters are:
 \begin{itemize}
-    \item \textbf{Convolution Output}: A localized dot-product between a defined $K\times K$ kernel and the target image region, followed immediately by a ReLU activation ($A = \max(0, Z)$).
-    \item \textbf{Fully Connected Sequence}: The localized feature maps are then flattened to intersect with a dense weight matrix resolving into Softmax distribution predictions. 
+    \item \textbf{Input size $784$:} required by flattening $28\times 28$ images.
+    \item \textbf{Hidden size $128$:} gives enough model capacity without adding too much extra cost; Figure \ref{fig:mlp_hidden_size_benchmark} shows only small gains beyond this point.
+    \item \textbf{Output size $10$:} fixed by MNIST class count.
+    \item \textbf{Learning rate $0.5$:} chosen so the MLP learns quickly in early epochs with Sigmoid activation.
+    \item \textbf{Weight init scale $0.05$:} avoids very large pre-activation values that can saturate Sigmoid.
+    \item \textbf{Loss epsilon $10^{-15}$:} prevents invalid $\log(0)$ in cross-entropy.
+    \item \textbf{Epochs $30$:} assignment-compliant training budget and sufficient for convergence.
 \end{itemize}
 
-\subsection{Initialization and Numerical Stability}
-To jumpstart training and prevent mathematical dead-ends, weights are carefully initialized using scaled random normal distributions (e.g., He or Xavier initializers). Special care is taken inside the Softmax implementation by subtracting maximum row values prior to exponentiation explicitly preventing `NaN` overflows, and a tiny $\epsilon$ is paired alongside logarithmic operations to mitigate division-by-zero bounds during loss evaluations.
+\subsubsection{Convolutional Neural Network (CNN) Implementation}
+The CNN implementation in \texttt{CNN\_template.py} also follows a manual step-by-step flow:
+\begin{enumerate}
+    \item Keep input images in 2D form and apply one valid-mode convolution filter.
+    \item Apply ReLU to the convolution output.
+    \item Flatten the feature map and apply a fully connected Softmax classifier.
+    \item Compute cross-entropy loss, backpropagate through dense and convolution layers, and update parameters.
+\end{enumerate}
 
-\begin{figure}[htbp]
+This gives the following structure:
+\begin{itemize}
+    \item \textbf{Convolution stage:} one filter with kernel size $7$ and ReLU nonlinearity.
+    \item \textbf{Classification stage:} flattened feature map projected to 10 classes with Softmax output.
+\end{itemize}
+
+The chosen CNN parameters are:
+\begin{itemize}
+    \item \textbf{Input size $28$:} keeps the spatial image layout explicit for valid-mode convolution.
+    \item \textbf{One convolution kernel:} matches the required single-convolution-layer architecture and keeps implementation manageable.
+    \item \textbf{Kernel size $7$:} selected from tested candidates as the best-performing setting under the fixed 5-epoch budget (Figure \ref{fig:cnn_kernel_tradeoff}).
+    \item \textbf{Flattened size $484$:} follows directly from valid convolution, $(28-7+1)^2 = 22^2$.
+    \item \textbf{Output size $10$:} fixed by MNIST class count.
+    \item \textbf{Learning rate $0.05$:} lower than MLP to keep CNN updates stable with manual convolution and dense projection.
+    \item \textbf{Loss epsilon $10^{-8}$:} prevents invalid logarithms in CNN cross-entropy.
+    \item \textbf{Epochs $5$:} assignment-compliant training budget.
+\end{itemize}
+
+\subsection{Concrete Training Walkthrough}
+Figure \ref{fig:mlp_training_walkthrough} shows one failed-guess case from my manual training pipeline. The sequence is forward pass, cross-entropy loss, backward pass, and parameter update. I include this case because it clearly shows how a wrong prediction produces a stronger correction signal, which then pushes probability toward the true class in the next update.
+
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth]{images/MLP/overview/mlp_training_flowchart_correct_guess.png}
-    \caption{End-to-End sequence of events spanning the Full Training Cycle, visualizing actual array manipulations across the forward pass (top) and the corrective backward pass gradients (bottom).}
-    \label{fig:mlp_flowchart}
+    \includegraphics[width=0.98\textwidth]{images/MLP/overview/mlp_training_flowchart_failed_guess.png}
+    \caption{Manual MLP training flow for a failed guess and correction.}
+    \label{fig:mlp_training_walkthrough}
 \end{figure}

@@ -16,3 +16,4 @@ presentation_notes.md
 *.synctex.gz
 *.toc
 
+.github/

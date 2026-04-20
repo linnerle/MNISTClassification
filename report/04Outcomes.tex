@@ -1,10 +1,24 @@
 \section{Learning Outcomes}
 
 \subsection{Tasks Accomplished}
-Over the course of this initiative, the core logic mapping for robust Neural Networks (both MLP and CNN architectures) was successfully achieved operating strictly utilizing pure NumPy matrix operations. We executed fully bespoke dataloading, unabstracted Forward Propagation layers (utilizing ReLU, Sigmoid and custom stable Softmax bindings), mathematically derived Backward Propagation cost derivatives mapped via careful chain-rule calculus, and effectively evaluated the resulting network implementations via detailed diagnostic visual metrics. 
+I completed manual implementations of both required models and their full training/evaluation pipelines in \texttt{MLP\_template.py} and \texttt{CNN\_template.py}. The main parts I finished were:
+\begin{itemize}
+	\item Manual cross-entropy loss with numerical-stability fixes (max-shift Softmax and an $\epsilon$ term in the logarithm).
+	\item Manual backpropagation for both models. For MLP, I computed Sigmoid-layer derivatives and updated parameters from those gradients. For CNN, I propagated gradients from the dense output layer back through flattening and then into the convolution kernel.
+	\item Debugging CNN tensor shapes so each step matched correctly. I checked that convolution outputs, flattened vectors, and reshaped gradients all stayed compatible during both forward and backward passes.
+	\item Targeted hyperparameter checks across the values I benchmarked, including MLP hidden size, MLP initialization scale, and CNN kernel size, to justify the final settings used in the templates.
+\end{itemize}
 
 \subsection{Challenges and Debugging Realities}
-Several profound constraints were encountered navigating mathematical thresholds organically. Chief among them involved floating point limits—specifically `NaN` returns spawned rapidly from exponential algorithms executing excessively large gradients (Gradient Explosion) and Cross-Entropy loss functions returning `-inf` errors evaluating arrays matching exactly zero. Effectively navigating these barriers heavily required establishing internal offsets (like epsilon values inside logarithms) and numerically stable maximums before Softmax distributions scaled, granting genuine stability directly into the backpropagation cycle. 
+The main challenge was debugging the manual training logic without autograd to catch mistakes for me. I had to check the forward pass, the gradients, and the parameter updates by hand, and the failed-guess training flowchart (Methodology, Figure \ref{fig:mlp_training_walkthrough}) was one of the investigative steps I used to confirm that the correction signal was behaving as expected.
+
+The CNN side was also constrained by the fixed 5-epoch limit in the project. That meant there was little room for slow convergence, so I had to keep the implementation simple, check the tensor shapes carefully, and use kernel-size benchmarking to choose a setting that learned reasonably well within the short training budget.
 
 \subsection{Lessons Learned}
-The manual reconstruction of algorithms typically handled safely behind high-level APIs (like PyTorch) significantly clarified why granular hyperparameter initializations govern model feasibility. Observing empirical evidence mapping localized structural weight limits confirmed exactly how gradients flow iteratively across dense architectures, delivering foundational insight paramount for advanced machine learning workflows hereafter. 
+These experiments helped me understand how architecture choices and training budget affect results:
+\begin{itemize}
+	\item The final MLP setting (hidden size 128, learning rate 0.5, 30 epochs) reached $0.9790$ test accuracy. Hidden-size testing showed only small gains beyond 128, so that looks like a practical point for this setup.
+	\item CNN test accuracy moved up and down across epochs ($0.9062 \rightarrow 0.8967 \rightarrow 0.9014 \rightarrow 0.8803 \rightarrow 0.9178$) even though loss kept decreasing. The main constraint was that the CNN was only allowed 5 epochs, so I treated the implementation as a short-training setup and used kernel-size benchmarking to make the most of that limited budget.
+	\item Kernel-size testing selected $7\times 7$ as the best option under the fixed 5-epoch budget, which supports using that value in \texttt{CNN\_template.py}.
+	\item Under the required budgets, the final gap between MLP ($97.90\%$) and CNN ($91.78\%$) is $6.12$ percentage points. In this setup, the MLP benefited from both longer training and stronger dense-layer capacity.
+\end{itemize}
