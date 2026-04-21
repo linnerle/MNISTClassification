@@ -17,8 +17,9 @@ The CNN side was also constrained by the fixed 5-epoch limit in the project. Tha
 \subsection{Lessons Learned}
 These experiments helped me understand how architecture choices and training budget affect results:
 \begin{itemize}
-	\item The final MLP setting (hidden size 128, learning rate 0.5, 30 epochs) reached $0.9790$ test accuracy. Hidden-size testing showed only small gains beyond 128, so that looks like a practical point for this setup.
-	\item CNN test accuracy moved up and down across epochs ($0.9062 \rightarrow 0.8967 \rightarrow 0.9014 \rightarrow 0.8803 \rightarrow 0.9178$) even though loss kept decreasing. The main constraint was that the CNN was only allowed 5 epochs, so I treated the implementation as a short-training setup and used kernel-size benchmarking to make the most of that limited budget.
-	\item Kernel-size testing selected $7\times 7$ as the best option under the fixed 5-epoch budget, which supports using that value in \texttt{CNN\_template.py}.
-	\item Under the required budgets, the final gap between MLP ($97.90\%$) and CNN ($91.78\%$) is $6.12$ percentage points. In this setup, the MLP benefited from both longer training and stronger dense-layer capacity.
+	\item The final MLP setting (hidden size 128, learning rate 0.5, 30 epochs) reached $0.9768$ test accuracy. Hidden-size testing showed negligible gains beyond 128 neurons (both 128 and 256 reached $0.967$), so that represents a practical capacity point for this setup.
+	\item CNN test accuracy moved nonlinearly across epochs ($0.920 \rightarrow 0.915 \rightarrow 0.938 \rightarrow 0.947 \rightarrow 0.930$) even though training loss decreased consistently. This pattern reflects the very tight 5-epoch budget, which left little room for stable convergence.
+	\item Kernel-size testing selected $7\times 7$ as the best option, achieving $0.933$ test accuracy under the 5-epoch constraint, confirming its selection in \texttt{CNN\_template.py}.
+	\item CNN batch-size analysis showed batch 64 performed best ($0.9296$ final accuracy with $0.2673$ loss), validating the chosen batch size of 64 in the template.
+	\item Under the required budgets, the final gap between MLP ($97.68\%$) and CNN ($92.96\%$) is $4.72$ percentage points. This gap reflects both the 6-fold longer training duration for MLP and the superior capacity of dense layers versus a single convolutional kernel for feature extraction on MNIST.
 \end{itemize}

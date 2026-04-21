@@ -4,9 +4,9 @@
 Experiments follow the exact training loops in the template files. MLP is trained with hidden size $128$, learning rate $0.5$, batch size $128$, and $30$ epochs; CNN uses one $7\times 7$ valid convolution kernel, learning rate $0.05$, batch size $64$, and $5$ epochs.
 
 \subsection{Training Progression and Feature Extraction}
-From Figure \ref{fig:mlp_curves}, I see that the MLP improves quickly at the start and then keeps improving more slowly across later epochs. In this run, test accuracy rises from $0.9166$ (epoch 1) to $0.9790$ (epoch 30).
+From Figure \ref{fig:mlp_curves}, I see that the MLP improves quickly at the start and then keeps improving more slowly across later epochs. In this run, test accuracy rises from $0.920$ (epoch 1) to $0.978$ (epoch 30), while training accuracy reaches $0.999$.
 
-Figure \ref{fig:cnn_curves} shows a different behavior for CNN. Training loss goes down in all 5 epochs, but test accuracy goes up and down, with a dip at epoch 4 ($0.8803$) before ending at $0.9178$. To me, this suggests unstable short-run behavior rather than steady generalization from epoch to epoch.
+Figure \ref{fig:cnn_curves} shows different behavior for CNN. Training loss decreases steadily across all 5 epochs (from $0.375$ to $0.210$), but test accuracy follows an uneven path, peaking at epoch 4 ($0.947$) before dropping to $0.932$ at epoch 5. To me, this suggests the CNN is still learning but exhibits less stable generalization than the MLP, likely due to the shorter 5-epoch training budget.
 
 \begin{figure}[!ht]
     \centering
@@ -27,33 +27,27 @@ Figure \ref{fig:cnn_curves} shows a different behavior for CNN. Training loss go
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/CNN/curves/cnn_training_loss_curve.png}
-        \caption{CNN training loss curve.}
+        \includegraphics[width=\textwidth]{images/CNN/curves/loss_accuracy.png}
+        \caption{CNN training loss and test accuracy curves.}
+        \label{fig:cnn_curves}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/CNN/curves/cnn_test_accuracy_curve.png}
-        \caption{CNN test accuracy curve.}
-        \label{fig:cnn_curves}
+        \includegraphics[width=\textwidth]{images/MLP/curves/neuron_comparison.png}
+        \caption{MLP hidden-size benchmark.}
+        \label{fig:mlp_hidden_size_benchmark}
     \end{minipage}
 \end{figure}
 
-Figure \ref{fig:cnn_kernel_tradeoff} summarizes kernel-size behavior. Among the tested settings, $7\times 7$ gives the highest final test accuracy ($0.9311$) and still keeps loss at a competitive level, so it is the most reasonable choice under the fixed 5-epoch budget.
+Figure \ref{fig:mlp_hidden_size_benchmark} shows that larger hidden size helps, but the gain after 128 neurons is negligible (both 128 and 256 neurons reach $0.967$ test accuracy by epoch 30). I interpret this as a diminishing-returns point for the current training setup.
+
+Figure \ref{fig:cnn_kernel_tradeoff} summarizes kernel-size behavior for CNN under the 5-epoch budget. Among the tested settings, $7\times 7$ achieves the best test accuracy ($0.933$) with competitive loss ($0.275$), so it is the most reasonable choice under this constraint.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.90\textwidth]{images/CNN/curves/kernel_size_loss_accuracy_tradeoff.png}
     \caption{CNN kernel-size tradeoff between final training loss and final test accuracy.}
     \label{fig:cnn_kernel_tradeoff}
-\end{figure}
-
-Figure \ref{fig:mlp_hidden_size_benchmark} shows that larger hidden size helps, but the gain after 128 neurons is small (from $0.9688$ at 128 to $0.9705$ at 256). I interpret this as a diminishing-returns point for the current training setup.
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.90\textwidth]{images/MLP/curves/neuron_comparison.png}
-    \caption{MLP hidden-size benchmark.}
-    \label{fig:mlp_hidden_size_benchmark}
 \end{figure}
 
 \begin{figure}[!ht]
@@ -66,7 +60,7 @@ Figure \ref{fig:mlp_hidden_size_benchmark} shows that larger hidden size helps, 
 In Figure \ref{fig:mlp_weights_grid}, different hidden units appear to focus on different stroke patterns. Some emphasize vertical or horizontal strokes, while others capture curved or crossing parts of digits. This suggests the hidden layer learns useful parts that the output layer later combines for final class decisions.
 
 \subsection{Qualitative Profiling and Confusion Analysis}
-Figure \ref{fig:mlp_cm} and Figure \ref{fig:cnn_cm} show a clear difference in error patterns. The MLP matrix is more concentrated on the diagonal, while the CNN matrix has more spread into off-diagonal cells after 5 epochs. For example, MLP mistakes like $4\rightarrow 9$ (15) and $5\rightarrow 3$ (13) are limited, but CNN mistakes like $8\rightarrow 3$ (132), $9\rightarrow 3$ (122), and $0\rightarrow 2$ (101) are much larger. I read this as CNN still being under-trained at this budget, especially on visually similar digits.
+Figure \ref{fig:mlp_cm} and Figure \ref{fig:cnn_cm} show a clear difference in error patterns. The MLP matrix is concentrated on the diagonal with few large off-diagonal mistakes, while the CNN matrix shows more scattered errors. From the MLP matrix, notable errors include $2\rightarrow 7$ (8 cases) and $4\rightarrow 9$ (17 cases); from the CNN matrix, larger confusion appears in $4\rightarrow 9$ (45 cases), $8\rightarrow 5$ (49 cases), and $3\rightarrow 5$ (25 cases). The MLP achieves $9768$ correct out of $10000$ ($0.9768$) while CNN achieves $9296$ correct ($0.9296$). I read this as the CNN being under-trained at its 5-epoch budget, especially on visually similar digit pairs.
 
 \begin{figure}[!ht]
     \centering
